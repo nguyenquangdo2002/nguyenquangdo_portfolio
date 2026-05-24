@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { ChevronDown, ArrowRight, Menu, X, ExternalLink, Github, Mail, Phone, MapPin, Code2, Server, Database, Cloud, Cpu, Wrench } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, ChevronDown, ExternalLink, Github, Mail, Menu, Phone, X, MapPin, Code2, Server, Database, Cloud, Cpu, Wrench } from "lucide-react";
+import { ThemeToggle } from "./components/ThemeToggle";
+import { LanguageSwitcher } from "./components/LanguageSwitcher";
+import { useTheme } from "./useTheme";
+import { useLocale, type Locale, type Translation } from "./useLocale";
 
 const SKILLS = [
   {
@@ -41,12 +46,12 @@ const PROJECTS = [
     title: "Task Management System",
     subtitle: "Mini Jira Clone",
     description:
-      "Full-stack task management app with CRUD, JWT authentication, role-based access (Admin/User), and search & filter by status/priority. Deployed fully on cloud infrastructure.",
+      "Full-stack task management app with CRUD, JWT authentication, role-based access (Admin/User), and search & filter by status/priority.",
     highlights: [
-      "Clean Architecture: Controller → Service → Repository pattern",
-      "Global Exception Middleware, BCrypt password hashing, parameterized queries",
-      "Backend: ASP.NET Core Web API (.NET 8) + EF Core + PostgreSQL on Railway via Docker",
-      "Frontend: React + Vite deployed on Vercel",
+      "Clean Architecture with Controller → Service → Repository pattern",
+      "Secure authentication with JWT and role-based access",
+      "Backend: ASP.NET Core Web API + EF Core + PostgreSQL",
+      "Frontend: React + Vite with polished UX",
     ],
     stack: ["C# .NET 8", "ASP.NET Core", "EF Core", "PostgreSQL", "JWT", "React", "Docker", "Railway", "Vercel"],
     links: {
@@ -60,11 +65,11 @@ const PROJECTS = [
     title: "Personal Portfolio",
     subtitle: "nguyenquangdo2002.github.io",
     description:
-      "Responsive developer portfolio built with HTML/CSS/JS and ReactJS. Designed with Figma prototype first, then implemented with full responsiveness across all devices.",
+      "Responsive portfolio built with modern web standards and a minimal visual language.",
     highlights: [
-      "Figma design prototype → production implementation",
-      "Fully responsive across mobile, tablet, and desktop",
-      "Built with ReactJS and modern CSS",
+      "Figma-first design, mobile responsive layout",
+      "Clean implementation with React and Tailwind",
+      "Fast performance and accessible structure",
     ],
     stack: ["ReactJS", "HTML/CSS", "JavaScript", "Figma", "GitHub Pages"],
     links: {
@@ -79,10 +84,10 @@ const EXPERIENCE = [
     company: "Multiplayer Game Development Company",
     period: "Feb 2025 – Jan 2026",
     bullets: [
-      "Developed and maintained game-related websites using PHP, HTML, CSS, JavaScript",
-      "Built referral tracking system to record user visits and registrations from referral links",
-      "Developed in-game events and item drop systems with Lua Script — directly impacts game revenue",
-      "QA testing for all game features; handled server incidents and player compensation",
+      "Built and maintained websites using PHP, HTML, CSS, JavaScript",
+      "Created referral tracking and registration workflows",
+      "Implemented game event systems with Lua scripting",
+      "Managed QA, incident response, and player support",
     ],
     sites: ["tl2gvn.com", "chuyenvan.net", "tantlhj.net", "vulinhgioi.com"],
   },
@@ -91,158 +96,151 @@ const EXPERIENCE = [
 const FAQS = [
   {
     q: "What roles are you targeting?",
-    a: "I'm seeking a full-time Front-end or Full-stack Developer position. I'm strongest in React and ASP.NET Core (.NET 8) but comfortable across the full stack from database design to UI implementation.",
+    a: "I'm seeking a full-time Front-end or Full-stack Developer position with strong React and ASP.NET Core skills.",
   },
   {
     q: "Are you available for immediate hire?",
-    a: "Yes. I'm actively looking for opportunities and available for full-time roles. I can join quickly and am comfortable with both onsite and remote arrangements.",
+    a: "Yes, I'm ready for full-time roles and can start quickly.",
   },
   {
     q: "What is your English proficiency?",
-    a: "I hold a TOEIC 700 score and am comfortable reading English technical documentation, participating in English-language code reviews, and collaborating with international teams.",
+    a: "I can read technical documentation, participate in code reviews, and work with international teams.",
   },
   {
     q: "Do you have experience with cloud deployment?",
-    a: "Yes — I've deployed full-stack applications on Railway (backend via Docker) and Vercel (frontend). I'm comfortable with Docker containerization and CI/CD workflows on GitHub.",
+    a: "Yes. I've deployed apps with Docker, Railway, and Vercel.",
   },
 ];
 
-function NavBar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
-  const links = ["Skills", "Projects", "Experience", "Contact"];
+function NavBar({
+  open,
+  setOpen,
+  theme,
+  toggleTheme,
+  locale,
+  setLocale,
+  t,
+}: {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+  locale: Locale;
+  setLocale: (value: Locale) => void;
+  t: Translation;
+}) {
+  const links = [
+    { label: t.nav.skills, href: "#skills" },
+    { label: t.nav.projects, href: "#projects" },
+    { label: t.nav.transformation, href: "/transformation" },
+    { label: t.nav.experience, href: "#experience" },
+    { label: t.nav.contact, href: "#contact" },
+  ];
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-[rgba(201,168,76,0.12)] bg-[#080808]/90 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between h-16">
-        <span className="font-['Playfair_Display'] text-[#c9a84c] font-bold text-lg tracking-tight">
-          NQD<span className="text-foreground">·dev</span>
-        </span>
-        <nav className="hidden md:flex items-center gap-8">
-          {links.map((l) => (
-            <a
-              key={l}
-              href={`#${l.toLowerCase()}`}
-              className="text-sm font-['DM_Sans'] text-muted-foreground hover:text-[#c9a84c] transition-colors duration-200"
-            >
-              {l}
-            </a>
-          ))}
-        </nav>
-        <a
-          href="mailto:nguyenquangdodmx2002@gmail.com"
-          className="hidden md:flex items-center gap-2 bg-[#c9a84c] text-[#080808] font-['DM_Sans'] font-semibold text-sm px-5 py-2.5 rounded-sm hover:bg-[#e0bc5c] transition-colors duration-200"
-        >
-          Hire Me
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <a href="#top" className="text-base font-semibold tracking-wide text-foreground">
+          NQD.dev
         </a>
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-      {open && (
-        <div className="md:hidden bg-[#0e0e0e] border-t border-border px-6 py-6 flex flex-col gap-5">
-          {links.map((l) => (
-            <a key={l} href={`#${l.toLowerCase()}`} className="font-['DM_Sans'] text-muted-foreground text-base" onClick={() => setOpen(false)}>
-              {l}
-            </a>
-          ))}
+
+        <nav className="hidden items-center gap-8 md:flex">
+          {links.map((link) =>
+            link.href.startsWith("/") ? (
+              <Link key={link.label} to={link.href} className="text-sm text-muted-foreground transition hover:text-foreground">
+                {link.label}
+              </Link>
+            ) : (
+              <a key={link.label} href={link.href} className="text-sm text-muted-foreground transition hover:text-foreground">
+                {link.label}
+              </a>
+            )
+          )}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher locale={locale} setLocale={setLocale} />
+          <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
           <a
             href="mailto:nguyenquangdodmx2002@gmail.com"
-            className="bg-[#c9a84c] text-[#080808] font-['DM_Sans'] font-semibold text-sm px-5 py-3 rounded-sm text-center mt-2"
+            className="hidden rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 md:inline-flex"
           >
-            Hire Me
+            {t.buttons.hire}
           </a>
+          <button className="md:hidden text-foreground" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="border-t border-border bg-background px-6 py-4 md:hidden">
+          <div className="flex flex-col gap-3">
+            {links.map((link) =>
+              link.href.startsWith("/") ? (
+                <Link key={link.label} to={link.href} className="text-sm text-muted-foreground transition hover:text-foreground" onClick={() => setOpen(false)}>
+                  {link.label}
+                </Link>
+              ) : (
+                <a key={link.label} href={link.href} className="text-sm text-muted-foreground transition hover:text-foreground" onClick={() => setOpen(false)}>
+                  {link.label}
+                </a>
+              )
+            )}
+            <LanguageSwitcher locale={locale} setLocale={setLocale} />
+            <a
+              href="mailto:nguyenquangdodmx2002@gmail.com"
+              className="inline-flex items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition hover:opacity-90"
+            >
+              {t.buttons.hire}
+            </a>
+          </div>
         </div>
       )}
     </header>
   );
 }
 
-function Hero() {
+function Hero({ t }: { t: Translation }) {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1800&h=1200&fit=crop&auto=format')" }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-[#080808]/95 via-[#080808]/80 to-[#080808]/60" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent" />
-
-      <div className="relative max-w-7xl mx-auto px-6 md:px-12 py-24 grid md:grid-cols-12 gap-8 items-center w-full">
-        <div className="md:col-span-9">
-          <div className="inline-flex items-center gap-2 border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.06)] px-4 py-1.5 rounded-sm mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c] animate-pulse" />
-            <span className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase">
-              Open to Work — Full-time
+    <section className="relative min-h-screen bg-background/95 pt-28">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-transparent" />
+      <div className="relative mx-auto max-w-6xl px-6 py-24">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_0.9fr] items-start">
+          <div className="space-y-8">
+            <span className="inline-flex rounded-full border border-border bg-card/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
+              {t.hero.badge}
             </span>
-          </div>
+            <div className="space-y-5 max-w-xl">
+              <h1 className="text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
+                {t.hero.title}
+              </h1>
+              <p className="text-base leading-8 text-muted-foreground md:text-lg">
+                {t.hero.description}
+              </p>
+            </div>
 
-          <h1 className="font-['Playfair_Display'] text-5xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.95] tracking-tight mb-4">
-            Nguyen<br />
-            <em className="italic text-[#c9a84c]">Quang Do.</em>
-          </h1>
-
-          <p className="font-['DM_Sans'] text-xl md:text-2xl text-foreground/60 font-light mb-3 tracking-wide">
-            Full-Stack Web Developer
-          </p>
-
-          <p className="font-['DM_Sans'] text-base md:text-lg text-foreground/50 max-w-2xl leading-relaxed mb-10 font-light">
-            Specialising in React and ASP.NET Core (.NET 8) — building production-grade applications with Clean Architecture, cloud deployment, and AI-assisted workflows.
-          </p>
-
-          <div className="flex flex-wrap gap-3 mb-10">
-            {[
-              { icon: Phone, text: "0925 709 729", href: "tel:0925709729" },
-              { icon: Mail, text: "nguyenquangdodmx2002@gmail.com", href: "mailto:nguyenquangdodmx2002@gmail.com" },
-              { icon: MapPin, text: "Gò Vấp, HCMC", href: "#" },
-              { icon: Github, text: "github.com/nguyenquangdo2002", href: "https://github.com/nguyenquangdo2002" },
-            ].map(({ icon: Icon, text, href }) => (
-              <a
-                key={text}
-                href={href}
-                target={href.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 border border-border bg-[#0e0e0e] px-4 py-2 rounded-sm text-muted-foreground text-sm font-['DM_Mono'] hover:border-[rgba(201,168,76,0.4)] hover:text-[#c9a84c] transition-all duration-200"
-              >
-                <Icon size={12} />
-                {text}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <a href="mailto:nguyenquangdodmx2002@gmail.com" className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-7 py-3 text-sm font-semibold text-background transition hover:opacity-90">
+                {t.buttons.contact}
+                <ArrowRight size={16} />
               </a>
-            ))}
+              <a href="https://github.com/nguyenquangdo2002" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center rounded-full border border-border px-7 py-3 text-sm text-foreground transition hover:border-foreground">
+                {t.buttons.github}
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a
-              href="mailto:nguyenquangdodmx2002@gmail.com"
-              className="group flex items-center justify-center gap-2 bg-[#c9a84c] text-[#080808] font-['DM_Sans'] font-semibold px-8 py-4 rounded-sm hover:bg-[#e0bc5c] transition-all duration-200 text-base"
-            >
-              Get in Touch
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" />
-            </a>
-            <a
-              href="https://github.com/nguyenquangdo2002"
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center justify-center gap-2 border border-[rgba(201,168,76,0.3)] text-[#c9a84c] font-['DM_Sans'] font-medium px-8 py-4 rounded-sm hover:bg-[rgba(201,168,76,0.06)] transition-colors duration-200 text-base"
-            >
-              <Github size={16} />
-              View GitHub
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats bar */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border border border-b-0 border-border rounded-t-sm overflow-hidden">
-            {[
-              { val: ".NET 8", label: "ASP.NET Core" },
-              { val: "React", label: "Frontend Stack" },
-              { val: "3.0", label: "GPA / 4.0" },
-              { val: "700", label: "TOEIC Score" },
-            ].map((s) => (
-              <div key={s.label} className="bg-[#0e0e0e] px-6 py-5 flex flex-col gap-0.5">
-                <span className="font-['Playfair_Display'] text-xl font-bold text-[#c9a84c]">{s.val}</span>
-                <span className="font-['DM_Sans'] text-xs text-muted-foreground tracking-wide uppercase">{s.label}</span>
-              </div>
-            ))}
+          <div className="rounded-[32px] border border-border bg-card p-8 text-foreground">
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.overview.title}</p>
+            <div className="mt-8 space-y-5">
+              {t.overview.stats.map((item) => (
+                <div key={item.label} className="rounded-3xl bg-background/80 p-5">
+                  <p className="text-2xl font-semibold text-foreground">{item.value}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{item.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -250,37 +248,32 @@ function Hero() {
   );
 }
 
-function Skills() {
+function Skills({ t }: { t: Translation }) {
   return (
-    <section id="skills" className="py-24 md:py-32 bg-[#060606]">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="mb-14">
-          <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-4">Tech Stack</p>
-          <h2 className="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-foreground leading-tight">
-            Skills & Expertise
-          </h2>
+    <section id="skills" className="py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-2xl text-center pb-12">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tech stack</p>
+          <h2 className="mt-3 text-4xl font-semibold text-foreground">{t.skills.title}</h2>
+          <p className="mt-4 text-base leading-7 text-muted-foreground">
+            {t.skills.description}
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-border border border-border rounded-sm overflow-hidden">
+        <div className="grid gap-5 md:grid-cols-3">
           {SKILLS.map(({ icon: Icon, label, items }) => (
-            <div
-              key={label}
-              className="group bg-[#0a0a0a] p-7 flex flex-col gap-4 hover:bg-[#111] transition-colors duration-300"
-            >
+            <div key={label} className="rounded-[28px] border border-border bg-card p-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-sm border border-[rgba(201,168,76,0.25)] bg-[rgba(201,168,76,0.06)] flex items-center justify-center group-hover:border-[rgba(201,168,76,0.5)] transition-colors duration-300">
-                  <Icon size={14} className="text-[#c9a84c]" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card/15 text-foreground">
+                  <Icon size={18} />
                 </div>
-                <span className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase">{label}</span>
+                <h3 className="text-lg font-semibold text-foreground">{label}</h3>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-5 space-y-3 text-sm text-muted-foreground">
                 {items.map((item) => (
-                  <span
-                    key={item}
-                    className="font-['DM_Sans'] text-foreground/70 text-sm bg-[#141414] border border-border px-3 py-1 rounded-sm"
-                  >
+                  <div key={item} className="rounded-2xl bg-background/80 px-3 py-2">
                     {item}
-                  </span>
+                  </div>
                 ))}
               </div>
             </div>
@@ -291,93 +284,70 @@ function Skills() {
   );
 }
 
-function Projects() {
+function Projects({ t }: { t: Translation }) {
   return (
-    <section id="projects" className="py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="mb-14">
-          <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-4">Work</p>
-          <h2 className="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-foreground leading-tight">
-            Projects
-          </h2>
+    <section id="projects" className="py-24 bg-background/95">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-2xl text-center pb-12">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.projects.label}</p>
+          <h2 className="mt-3 text-4xl font-semibold text-foreground">{t.projects.title}</h2>
         </div>
 
         <div className="space-y-6">
-          {PROJECTS.map((p, i) => (
-            <div
-              key={p.title}
-              className="border border-border bg-[#0a0a0a] rounded-sm overflow-hidden hover:border-[rgba(201,168,76,0.3)] transition-colors duration-300"
-            >
-              <div className="grid md:grid-cols-12 gap-0">
-                {/* Left accent */}
-                <div className="md:col-span-1 bg-[#080808] border-r border-border flex items-center justify-center p-4 md:p-0">
-                  <span className="font-['DM_Mono'] text-[#c9a84c]/40 text-xs md:[writing-mode:vertical-rl] md:rotate-180 tracking-widest">
-                    {p.year}
-                  </span>
+          {PROJECTS.map((project) => (
+            <article key={project.title} className="rounded-[32px] border border-border bg-card p-8">
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-3">
+                  <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{project.tag}</p>
+                  <h3 className="text-2xl font-semibold text-foreground">{project.title}</h3>
+                  <p className="text-sm text-muted-foreground">{project.subtitle}</p>
                 </div>
-
-                <div className="md:col-span-11 p-7 md:p-10">
-                  <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-                    <div>
-                      <span className="font-['DM_Mono'] text-muted-foreground text-xs tracking-widest uppercase mb-2 block">
-                        {p.tag}
-                      </span>
-                      <h3 className="font-['Playfair_Display'] text-2xl md:text-3xl font-bold text-foreground">
-                        {p.title}
-                      </h3>
-                      <p className="font-['DM_Mono'] text-[#c9a84c] text-sm mt-1">{p.subtitle}</p>
-                    </div>
-                    <div className="flex gap-3">
-                      {p.links.backend && (
-                        <a
-                          href={p.links.backend}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 border border-border text-muted-foreground text-xs font-['DM_Mono'] px-3 py-2 rounded-sm hover:border-[rgba(201,168,76,0.4)] hover:text-[#c9a84c] transition-all duration-200"
-                        >
-                          <Server size={11} /> Backend
-                          <ExternalLink size={10} />
-                        </a>
-                      )}
-                      {p.links.frontend && (
-                        <a
-                          href={p.links.frontend}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 border border-border text-muted-foreground text-xs font-['DM_Mono'] px-3 py-2 rounded-sm hover:border-[rgba(201,168,76,0.4)] hover:text-[#c9a84c] transition-all duration-200"
-                        >
-                          <ExternalLink size={11} /> Live
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  <p className="font-['DM_Sans'] text-foreground/60 text-sm leading-relaxed font-light mb-5">
-                    {p.description}
-                  </p>
-
-                  <ul className="space-y-2 mb-6">
-                    {p.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-2.5">
-                        <span className="w-1 h-1 rounded-full bg-[#c9a84c] mt-2 flex-shrink-0" />
-                        <span className="font-['DM_Sans'] text-foreground/60 text-sm font-light">{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="flex flex-wrap gap-2">
-                    {p.stack.map((s) => (
-                      <span
-                        key={s}
-                        className="font-['DM_Mono'] text-[10px] text-[#c9a84c]/70 border border-[rgba(201,168,76,0.2)] bg-[rgba(201,168,76,0.04)] px-2.5 py-1 rounded-sm tracking-wide"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <span className="rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  {project.year}
+                </span>
               </div>
-            </div>
+
+              <p className="mt-6 text-sm leading-7 text-muted-foreground">{project.description}</p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {project.highlights.map((highlight) => (
+                  <div key={highlight} className="rounded-3xl bg-background/80 p-4 text-sm text-muted-foreground">
+                    {highlight}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {project.stack.map((item) => (
+                  <span key={item} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                {project.links.backend && (
+                  <a
+                    href={project.links.backend}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs text-foreground transition hover:border-foreground"
+                  >
+                    <Server size={14} /> Backend
+                  </a>
+                )}
+                {project.links.frontend && (
+                  <a
+                    href={project.links.frontend}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs text-foreground transition hover:border-foreground"
+                  >
+                    <ExternalLink size={14} /> Live
+                  </a>
+                )}
+              </div>
+            </article>
           ))}
         </div>
       </div>
@@ -385,49 +355,40 @@ function Projects() {
   );
 }
 
-function Experience() {
+function Experience({ t }: { t: Translation }) {
   return (
-    <section id="experience" className="py-24 md:py-32 bg-[#060606]">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="mb-14">
-          <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-4">Background</p>
-          <h2 className="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-foreground leading-tight">
-            Experience & Education
-          </h2>
+    <section id="experience" className="py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-2xl text-center pb-12">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.experience.label}</p>
+          <h2 className="mt-3 text-4xl font-semibold text-foreground">{t.experience.title}</h2>
         </div>
 
-        <div className="grid md:grid-cols-12 gap-8">
-          {/* Experience */}
-          <div className="md:col-span-7 space-y-6">
-            {EXPERIENCE.map((e) => (
-              <div key={e.role} className="border border-border bg-[#0a0a0a] rounded-sm p-7 hover:border-[rgba(201,168,76,0.3)] transition-colors duration-300">
-                <div className="flex flex-wrap items-start justify-between gap-2 mb-5">
+        <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+          <div className="space-y-6">
+            {EXPERIENCE.map((item) => (
+              <div key={item.role} className="rounded-[32px] border border-border bg-card p-8">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="font-['Playfair_Display'] text-xl font-bold text-foreground">{e.role}</h3>
-                    <p className="font-['DM_Sans'] text-muted-foreground text-sm mt-0.5">{e.company}</p>
+                    <h3 className="text-xl font-semibold text-foreground">{item.role}</h3>
+                    <p className="text-sm text-muted-foreground">{item.company}</p>
                   </div>
-                  <span className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-wide border border-[rgba(201,168,76,0.25)] px-3 py-1 rounded-sm">
-                    {e.period}
+                  <span className="rounded-full border border-border px-4 py-2 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                    {item.period}
                   </span>
                 </div>
-                <ul className="space-y-2.5 mb-5">
-                  {e.bullets.map((b) => (
-                    <li key={b} className="flex items-start gap-2.5">
-                      <span className="w-1 h-1 rounded-full bg-[#c9a84c] mt-2 flex-shrink-0" />
-                      <span className="font-['DM_Sans'] text-foreground/60 text-sm font-light leading-relaxed">{b}</span>
+                <ul className="mt-6 space-y-3 text-sm leading-7 text-muted-foreground">
+                  {item.bullets.map((point) => (
+                    <li key={point} className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 rounded-full bg-foreground" />
+                      <span>{point}</span>
                     </li>
                   ))}
                 </ul>
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
-                  {e.sites.map((s) => (
-                    <a
-                      key={s}
-                      href={`https://${s}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-['DM_Mono'] text-[10px] text-muted-foreground border border-border px-2.5 py-1 rounded-sm hover:text-[#c9a84c] hover:border-[rgba(201,168,76,0.3)] transition-all duration-200"
-                    >
-                      {s}
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {item.sites.map((site) => (
+                    <a key={site} href={`https://${site}`} target="_blank" rel="noreferrer" className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:border-foreground">
+                      {site}
                     </a>
                   ))}
                 </div>
@@ -435,38 +396,33 @@ function Experience() {
             ))}
           </div>
 
-          {/* Education + About */}
-          <div className="md:col-span-5 space-y-6">
-            <div className="border border-border bg-[#0a0a0a] rounded-sm p-7 hover:border-[rgba(201,168,76,0.3)] transition-colors duration-300">
-              <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-4">Education</p>
-              <h3 className="font-['Playfair_Display'] text-lg font-bold text-foreground mb-1">
-                Industrial University of Ho Chi Minh City
-              </h3>
-              <p className="font-['DM_Sans'] text-muted-foreground text-sm mb-4">
-                Information Systems · Oct 2020 – Present
-              </p>
-              <div className="flex gap-3 flex-wrap">
-                {["GPA 3.0 / 4.0", "TOEIC 700"].map((badge) => (
-                  <span key={badge} className="font-['DM_Mono'] text-xs text-[#c9a84c] border border-[rgba(201,168,76,0.3)] bg-[rgba(201,168,76,0.05)] px-3 py-1.5 rounded-sm">
+          <div className="space-y-6">
+            <div className="rounded-[32px] border border-border bg-card p-8">
+              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.experience.education}</p>
+              <h3 className="mt-4 text-xl font-semibold text-foreground">Industrial University of Ho Chi Minh City</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Information Systems · Oct 2020 – Present</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {['GPA 3.0 / 4.0', 'TOEIC 700'].map((badge) => (
+                  <span key={badge} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
                     {badge}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="border border-[rgba(201,168,76,0.2)] bg-[rgba(201,168,76,0.03)] rounded-sm p-7">
-              <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-4">About Me</p>
-              <ul className="space-y-3">
+            <div className="rounded-[32px] border border-border bg-card p-8">
+              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.experience.aboutTitle}</p>
+              <ul className="mt-6 space-y-3 text-sm leading-7 text-muted-foreground">
                 {[
                   "Seeking full-time Front-end or Full-stack Developer role",
-                  "Strong in React, ASP.NET Core, and modern JS ecosystem",
-                  "Hands-on from traditional PHP to Clean Architecture with .NET 8 and cloud deployment",
-                  "Fast learner, responsible, team-oriented",
-                  "Comfortable reading English technical documentation",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2.5">
-                    <span className="w-1 h-1 rounded-full bg-[#c9a84c] mt-2 flex-shrink-0" />
-                    <span className="font-['DM_Sans'] text-foreground/60 text-sm font-light leading-relaxed">{t}</span>
+                  "Strong in React, ASP.NET Core, and modern web development",
+                  "Experience with Clean Architecture and cloud deployment",
+                  "Fast learner and detail-oriented",
+                  "Comfortable collaborating with international teams",
+                ].map((point) => (
+                  <li key={point} className="flex items-start gap-3">
+                    <span className="mt-1 h-2 w-2 rounded-full bg-foreground" />
+                    <span>{point}</span>
                   </li>
                 ))}
               </ul>
@@ -478,35 +434,29 @@ function Experience() {
   );
 }
 
-function FAQ() {
+function FAQ({ t }: { t: Translation }) {
   const [open, setOpen] = useState<number | null>(null);
+
   return (
-    <section id="faq" className="py-24 md:py-32">
-      <div className="max-w-3xl mx-auto px-6 md:px-12">
-        <div className="text-center mb-14">
-          <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-4">Quick Answers</p>
-          <h2 className="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-foreground leading-tight">
-            Common Questions
-          </h2>
+    <section id="faq" className="py-24 bg-background/95">
+      <div className="mx-auto max-w-3xl px-6">
+        <div className="text-center pb-12">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.faq.label}</p>
+          <h2 className="mt-3 text-4xl font-semibold text-foreground">{t.faq.title}</h2>
         </div>
-        <div className="space-y-px border border-border rounded-sm overflow-hidden">
-          {FAQS.map((faq, i) => (
-            <div key={i} className="bg-[#0a0a0a] border-b border-border last:border-b-0">
+        <div className="space-y-3 rounded-[32px] border border-border bg-card">
+          {t.faq.items.map((faq, index) => (
+            <div key={faq.q} className="border-b border-border last:border-b-0">
               <button
-                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group"
-                onClick={() => setOpen(open === i ? null : i)}
+                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-sm font-medium text-foreground"
+                onClick={() => setOpen(open === index ? null : index)}
               >
-                <span className="font-['DM_Sans'] text-foreground font-medium text-base group-hover:text-[#c9a84c] transition-colors duration-200">
-                  {faq.q}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className={`flex-shrink-0 text-muted-foreground transition-transform duration-300 ${open === i ? "rotate-180 text-[#c9a84c]" : ""}`}
-                />
+                <span>{faq.q}</span>
+                <ChevronDown size={18} className={`transition-transform duration-200 ${open === index ? "rotate-180" : ""}`} />
               </button>
-              {open === i && (
-                <div className="px-6 pb-6">
-                  <p className="font-['DM_Sans'] text-muted-foreground text-sm leading-relaxed font-light">{faq.a}</p>
+              {open === index && (
+                <div className="px-6 pb-6 pt-1">
+                  <p className="text-sm leading-7 text-muted-foreground">{faq.a}</p>
                 </div>
               )}
             </div>
@@ -517,59 +467,37 @@ function FAQ() {
   );
 }
 
-function Contact() {
+function Contact({ t }: { t: Translation }) {
   return (
-    <section id="contact" className="relative py-32 md:py-40 overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1800&h=900&fit=crop&auto=format')" }}
-      />
-      <div className="absolute inset-0 bg-[#080808]/90" />
-
-      <div className="relative max-w-3xl mx-auto px-6 md:px-12 text-center">
-        <p className="font-['DM_Mono'] text-[#c9a84c] text-xs tracking-widest uppercase mb-6">Let's Work Together</p>
-        <h2 className="font-['Playfair_Display'] text-5xl md:text-7xl font-black text-foreground leading-[0.95] tracking-tight mb-6">
-          Open to<br />
-          <em className="italic text-[#c9a84c]">opportunities.</em>
-        </h2>
-        <p className="font-['DM_Sans'] text-foreground/50 text-base max-w-lg mx-auto mb-10 font-light leading-relaxed">
-          I'm actively seeking full-time Front-end or Full-stack roles. If you're looking for a developer who ships production-grade code and learns fast, let's talk.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+    <section id="contact" className="py-24">
+      <div className="mx-auto max-w-5xl px-6 text-center">
+        <div className="rounded-[32px] border border-border bg-card px-8 py-16">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">{t.contact.label}</p>
+          <h2 className="mt-4 text-4xl font-semibold text-foreground">{t.contact.title}</h2>
+          <p className="mt-6 text-base leading-8 text-muted-foreground">
+            {t.contact.description}
+          </p>
           <a
             href="mailto:nguyenquangdodmx2002@gmail.com"
-            className="group inline-flex items-center justify-center gap-2 bg-[#c9a84c] text-[#080808] font-['DM_Sans'] font-bold px-8 py-4 rounded-sm hover:bg-[#e0bc5c] transition-all duration-200 text-base"
+            className="mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-foreground px-8 py-3 text-sm font-semibold text-background transition hover:opacity-90"
           >
-            <Mail size={16} />
-            nguyenquangdodmx2002@gmail.com
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" />
+            <Mail size={16} /> {t.contact.button}
           </a>
+          <p className="mt-8 text-xs text-muted-foreground">{t.contact.meta}</p>
         </div>
-        <p className="font-['DM_Mono'] text-muted-foreground text-xs mt-8">
-          0925 709 729 · Gò Vấp, HCMC · github.com/nguyenquangdo2002
-        </p>
       </div>
     </section>
   );
 }
 
-function Footer() {
+function Footer({ t }: { t: Translation }) {
   return (
-    <footer className="bg-[#060606] border-t border-border py-10">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
-        <span className="font-['Playfair_Display'] text-[#c9a84c] font-bold text-lg">
-          NQD<span className="text-foreground">·dev</span>
-        </span>
-        <p className="font-['DM_Mono'] text-muted-foreground text-xs">
-          © 2025 Nguyen Quang Do · Full-Stack Web Developer · Ho Chi Minh City
-        </p>
-        <a
-          href="https://github.com/nguyenquangdo2002"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 font-['DM_Sans'] text-muted-foreground text-xs hover:text-[#c9a84c] transition-colors duration-200"
-        >
-          <Github size={12} /> GitHub
+    <footer className="border-t border-border bg-background/95 py-10">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 text-center md:flex-row md:text-left">
+        <span className="text-base font-semibold text-foreground">NQD.dev</span>
+        <p className="text-sm text-muted-foreground">{t.footer.copyright}</p>
+        <a href="https://github.com/nguyenquangdo2002" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground">
+          <Github size={14} /> GitHub
         </a>
       </div>
     </footer>
@@ -578,16 +506,21 @@ function Footer() {
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const { locale, setLocale, t } = useLocale();
+
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <NavBar open={menuOpen} setOpen={setMenuOpen} />
-      <Hero />
-      <Skills />
-      <Projects />
-      <Experience />
-      <FAQ />
-      <Contact />
-      <Footer />
+      <NavBar open={menuOpen} setOpen={setMenuOpen} theme={theme} toggleTheme={toggleTheme} locale={locale} setLocale={setLocale} t={t} />
+      <main>
+        <Hero t={t} />
+        <Skills t={t} />
+        <Projects t={t} />
+        <Experience t={t} />
+        <FAQ t={t} />
+        <Contact t={t} />
+      </main>
+      <Footer t={t} />
     </div>
   );
 }

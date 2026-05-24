@@ -1,0 +1,8 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" rx="56" fill="#111827" />
+  <rect x="80" y="80" width="1040" height="740" rx="48" fill="#1F2937" />
+  <text x="50%" y="45%" text-anchor="middle" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="72" font-weight="700">2020</text>
+  <text x="50%" y="58%" text-anchor="middle" fill="#94A3B8" font-family="Inter, sans-serif" font-size="32">Before transformation</text>
+  <rect x="250" y="620" width="700" height="120" rx="32" fill="#0F172A" />
+  <text x="600" y="700" text-anchor="middle" fill="#D1D5DB" font-family="Inter, sans-serif" font-size="28">Personal story photo</text>
+</svg>
